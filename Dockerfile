@@ -6,6 +6,11 @@ ENV PREFIX /opt/pymol
 ENV MODULES $PREFIX/modules
 
 RUN apt-get update && apt-get install -y \
+  software-properties-common
+RUN add-apt-repository -y \
+  ppa:paulo-miguel-dias/mesa
+
+RUN apt-get update && apt-get install -y \
   build-essential \
   freeglut3-dev \
   libfreetype6-dev \
