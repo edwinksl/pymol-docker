@@ -25,6 +25,18 @@ WORKDIR pymol
 RUN python setup.py build install --home=$PREFIX --install-lib=$MODULES --install-scripts=$PREFIX
 WORKDIR $PREFIX
 
+# Nasty workaround for GUI apps; slightly modified from http://fabiorehm.com/blog/2014/09/11/running-gui-apps-with-docker/
+RUN export uid=1000 gid=1000 && \
+    mkdir -p /home/developer && \
+    mkdir -p /etc/sudoers.d && \
+    echo "developer:x:${uid}:${gid}:developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
+    echo "developer:x:${gid}:" >> /etc/group && \
+    echo "developer ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer && \
+    chmod 0440 /etc/sudoers.d/developer && \
+    chown ${uid}:${gid} -R /home/developer
+USER developer
+ENV HOME /home/developer
+
 VOLUME $PREFIX
 
 CMD ["./pymol"]
