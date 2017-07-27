@@ -24,18 +24,21 @@ RUN wget -qO - ${PYMOL_URL}/pymol-v${PYMOL_VERSION}.tar.bz2 | tar -xvj
 WORKDIR pymol
 RUN python setup.py build install --home=$PREFIX --install-lib=$MODULES --install-scripts=$PREFIX
 WORKDIR $PREFIX
+RUN rm -rf /tmp/pymol
 
 # Nasty workaround for GUI apps; slightly modified from http://fabiorehm.com/blog/2014/09/11/running-gui-apps-with-docker/
-RUN export uid=1000 gid=1000 && \
-  mkdir -p /home/developer && \
+ENV USER_NAME developer
+ENV USER_GROUP developer
+ENV HOME /home/$USER_NAME
+RUN export UID=1000 GID=1000 && \
+  mkdir -p $HOME && \
   mkdir -p /etc/sudoers.d && \
-  echo "developer:x:${uid}:${gid}:developer,,,:/home/developer:/bin/bash" >> /etc/passwd && \
-  echo "developer:x:${gid}:" >> /etc/group && \
-  echo "developer ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/developer && \
-  chmod 0440 /etc/sudoers.d/developer && \
-  chown ${uid}:${gid} -R /home/developer
-USER developer
-ENV HOME /home/developer
+  echo "$USER_NAME:x:$UID:$GID:$USER_NAME,,,:$HOME:/bin/bash" >> /etc/passwd && \
+  echo "$USER_GROUP:x:$GID:" >> /etc/group && \
+  echo "$USER_NAME ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME && \
+  chmod 0440 /etc/sudoers.d/$USER_NAME && \
+  chown $UID:$GID -R $HOME
+USER $USER_NAME
 
 VOLUME $PREFIX
 
