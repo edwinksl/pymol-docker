@@ -2,6 +2,8 @@ Repository for Docker image for PyMOL.
 
 PyMOL version: 1.8.6.0
 
+Docker Hub URL: https://hub.docker.com/r/edwinksl/pymol/
+
 # Instructions
 
 1. `sudo docker pull edwinksl/pymol`
